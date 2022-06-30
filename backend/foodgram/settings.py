@@ -17,6 +17,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'rest_framework.authtoken',
     'djoser',
     'api',
     'recipes',
@@ -102,9 +103,9 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 6,
 }
 
-DJOSER = {
-   'SERIALIZERS': {
-    'user': 'users.serializers.CustomUserSerializer',
-    'user_create': 'users.serializers.CustomUserSerializer'
-   }
-}
+# DJOSER = {
+#    'SERIALIZERS': {
+#     'user': 'users.serializers.CustomUserSerializer',
+#     'user_create': 'users.serializers.CustomUserSerializer'
+#    }
+# }

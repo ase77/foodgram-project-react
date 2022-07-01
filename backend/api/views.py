@@ -1,38 +1,38 @@
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.authtoken.views import ObtainAuthToken
-from rest_framework.authtoken.models import Token
-from rest_framework import permissions, viewsets, views, status
+from rest_framework import permissions, viewsets, mixins, status
 from rest_framework.response import Response
+from rest_framework.decorators import action
 from django.shortcuts import get_object_or_404
 from users.models import CustomUser
-from .serializers import CustomUserSerializer, TokenSerializer
+from .serializers import CustomUserSerializer, SetPasswordSerializer
 
 
-class UserModelViewSet(viewsets.ModelViewSet):
+class UserModelViewSet(mixins.CreateModelMixin,
+                       mixins.RetrieveModelMixin,
+                       mixins.ListModelMixin,
+                       viewsets.GenericViewSet):
     queryset = CustomUser.objects.all()
     serializer_class = CustomUserSerializer
-    lookup_field = 'username'
     pagination_class = PageNumberPagination
-
-
-class ObtainToken(ObtainAuthToken):
-    serializer_class = TokenSerializer
     permission_classes = (permissions.AllowAny,)
 
-    def post(self, request):
-        serializer = TokenSerializer(data=request.data)
+    @action(methods=['get'], detail=False,
+            permission_classes=[permissions.IsAuthenticated], url_name='users')
+    def me(self, request, *args, **kwargs):
+        self.object = get_object_or_404(CustomUser, pk=request.user.id)
+        serializer = self.get_serializer(self.object)
+        return Response(serializer.data)
+
+    @action(methods=['post'], detail=False,
+            permission_classes=[permissions.IsAuthenticated], url_name='users')
+    def set_password(self, request, *args, **kwargs):
+        user = get_object_or_404(CustomUser, pk=request.user.id)
+        serializer = SetPasswordSerializer(data=request.data)
         if serializer.is_valid():
-            user = get_object_or_404(
-                CustomUser, email=serializer.validated_data['email']
-            )
-            token, created = Token.objects.get_or_create(user=user)
-            return Response(
-                {
-                    'auth_token': token.key
-                },
-                status=status.HTTP_201_CREATED
-            )
-        return Response(
-            serializer.errors,
-            status=status.HTTP_400_BAD_REQUEST
-        )
+            if not user.check_password(serializer.data.get("current_password")):
+                return Response({'status': 'Текущий пароль не действителен'},
+                            status=status.HTTP_400_BAD_REQUEST)
+            user.set_password(serializer.validated_data['new_password'])
+            user.save()
+            return Response({'status': 'Пароль успешно изменен'},
+                            status=status.HTTP_204_NO_CONTENT,)

@@ -1,30 +1,25 @@
-from rest_framework.authtoken.serializers import AuthTokenSerializer
-from rest_framework import exceptions, serializers
-from django.contrib.auth import authenticate
+from rest_framework import serializers
 from users.models import CustomUser
 
 
 class CustomUserSerializer(serializers.ModelSerializer):
 
+    password = serializers.CharField(write_only=True, required=True)
+
     class Meta:
         model = CustomUser
         fields = [
-            'id', 'username', 'email', 'first_name', 'last_name'
+            'id', 'username', 'email', 'first_name', 'last_name', 'password'
         ]
 
 
-class TokenSerializer(serializers.Serializer):
-    email = serializers.EmailField(max_length=254)
-    password = serializers.CharField(max_length=128)
+class SetPasswordSerializer(serializers.ModelSerializer):
 
-    def validate(self, data):
+    new_password = serializers.CharField(required=True)
+    current_password = serializers.CharField(required=True)
 
-        try:
-            user = CustomUser.objects.get(email=data['email'])
-        except CustomUser.DoesNotExist:
-            raise serializers.ValidationError(
-                'email незарегистрированного пользователя.'
-            )
-        if user.check_password(data['password']):
-            return data
-        raise serializers.ValidationError('Неверный пароль')
+    class Meta:
+        model = CustomUser
+        fields = [
+            'new_password', 'current_password'
+        ]

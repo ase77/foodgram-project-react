@@ -96,16 +96,14 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 AUTH_USER_MODEL = 'users.CustomUser'
 
+VALUE_DISPLAY = '-пусто-'
+
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
     ],
-    'PAGE_SIZE': 6,
+    'DEFAULT_PAGINATION_CLASS': [
+        'rest_framework.pagination.LimitOffsetPagination',
+    ],
+    'PAGE_SIZE': 6
 }
-
-# DJOSER = {
-#    'SERIALIZERS': {
-#     'user': 'users.serializers.CustomUserSerializer',
-#     'user_create': 'users.serializers.CustomUserSerializer'
-#    }
-# }

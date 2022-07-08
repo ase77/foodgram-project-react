@@ -65,6 +65,7 @@ class IngredientViewSet(mixins.RetrieveModelMixin,
 class RecipeViewSet(mixins.RetrieveModelMixin,
                     mixins.ListModelMixin,
                     mixins.CreateModelMixin,
+                    mixins.UpdateModelMixin,
                     mixins.DestroyModelMixin,
                     viewsets.GenericViewSet):
     queryset = Recipe.objects.all()
@@ -80,13 +81,17 @@ class RecipeViewSet(mixins.RetrieveModelMixin,
 
     def create(self, request, *args, **kwargs):
         if bool(request.user and request.user.is_authenticated):
-            print(data.recipe.id)
-            data = {'user': request.user.id, 'recipe': request.recipe.id}
-            serializer = self.get_serializer(data=data, context={'request': request})
+            serializer = self.get_serializer(
+                data=request.data, context={'request': request}
+            )
             serializer.is_valid(raise_exception=True)
             self.perform_create(serializer)
             headers = self.get_success_headers(serializer.data)
-            return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+            return Response(
+                serializer.data,
+                status=status.HTTP_201_CREATED,
+                headers=headers
+            )
         return Response(
             {'status': 'Пользователь не авторизован'},
              status=status.HTTP_401_UNAUTHORIZED)
@@ -94,23 +99,46 @@ class RecipeViewSet(mixins.RetrieveModelMixin,
     def perform_create(self, serializer):
         serializer.save()
 
-    # @staticmethod
-    # def delete_method_for_actions(request, pk, model):
-    #     user = request.user
-    #     recipe = get_object_or_404(Recipe, id=pk)
-    #     model_obj = get_object_or_404(model, user=user, recipe=recipe)
-    #     model_obj.delete()
-    #     return Response(status=status.HTTP_204_NO_CONTENT)
     def destroy(self, request, *args, **kwargs):
-        print(request.user)
-        print(request.recipe.author)
-        if bool(request.user == request.recipe.author):
-            instance = get_object_or_404(Recipe, request.recipe.id)
-            self.perform_destroy(instance)
-            return Response(status=status.HTTP_204_NO_CONTENT)
+        pk = kwargs.get('pk', None)
+        recipe = get_object_or_404(Recipe, id=pk)
+        if bool(request.user == recipe.author):
+            self.perform_destroy(recipe)
+            return Response(
+                {'status': 'Рецепт успешно удалён'},
+            status=status.HTTP_204_NO_CONTENT)
+        elif bool(request.user and not request.user.is_authenticated):
+            return Response(
+                {'status': 'Пользователь не авторизован'},
+            status=status.HTTP_401_UNAUTHORIZED)
         return Response(
             {'status': 'Недостаточно прав для удаления'},
              status=status.HTTP_403_FORBIDDEN)
 
-    def perform_destroy(self, instance):
-        instance.delete()
+    def perform_destroy(self, recipe):
+        recipe.delete()
+
+    def update(self, *args, **kwargs):
+        return Response(
+            {'status': 'Method "PUT" not allowed.'},
+            status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def partial_update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', True)
+        pk = kwargs.get('pk', None)
+        instance = get_object_or_404(Recipe, id=pk)
+        if bool(request.user == instance.author):
+            serializer = self.get_serializer(instance, data=request.data, partial=partial)
+            serializer.is_valid(raise_exception=True)
+            self.perform_update(serializer)
+            return Response(serializer.data)
+        elif bool(request.user and not request.user.is_authenticated):
+            return Response(
+                {'status': 'Пользователь не авторизован'},
+                status=status.HTTP_401_UNAUTHORIZED)
+        return Response(
+            {'status': 'Недостаточно прав для обновления'},
+             status=status.HTTP_403_FORBIDDEN)
+
+    def perform_update(self, serializer):
+        serializer.save()

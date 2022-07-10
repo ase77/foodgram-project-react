@@ -1,4 +1,3 @@
-# praktikum_new_diplom
 <a id="anchor"></a>
 # Проект Foodgram "Продуктовый помощник"
 ![example workflow](https://github.com/ase77/yamdb_final/actions/workflows/yamdb_workflow.yml/badge.svg)

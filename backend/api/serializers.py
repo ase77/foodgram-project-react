@@ -1,8 +1,9 @@
+from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
+
+from recipes.models import (Favorite, Ingredient, IngredientRecipe, Recipe,
+                            ShoppingCart, Tag)
 from users.models import CustomUser, Follow
-from recipes.models import (
-    Tag, Ingredient, IngredientRecipe, Recipe, Favorite, ShoppingCart
-)
 
 
 class CustomUserSerializer(serializers.ModelSerializer):
@@ -12,7 +13,8 @@ class CustomUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = [
-            'id', 'username', 'email', 'first_name', 'last_name', 'password', 'is_subscribed'
+            'id', 'username', 'email', 'first_name', 'last_name',
+            'password', 'is_subscribed'
         ]
 
     def get_is_subscribed(self, obj):
@@ -105,7 +107,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         queryset=Tag.objects.all(), many=True)
     ingredients = AddIngredientSerializer(many=True)
     author = CustomUserSerializer(read_only=True)
-    image = serializers.IntegerField(read_only=True)
+    image = Base64ImageField()
 
     class Meta:
         model = Recipe

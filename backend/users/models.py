@@ -18,7 +18,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         verbose_name='Фамилия', max_length=150
     )
     password = models.CharField(
-         verbose_name='Пароль', max_length=150
+        verbose_name='Пароль', max_length=150
     )
     is_staff = models.BooleanField(default=False)
 
@@ -63,6 +63,7 @@ class Follow(models.Model):
         ]
         verbose_name_plural = 'Подписки'
         verbose_name = 'Подписку'
+        ordering = ('-id',)
 
     def __str__(self):
         return self.user.username

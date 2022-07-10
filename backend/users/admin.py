@@ -2,7 +2,8 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
 from foodgram.settings import VALUE_DISPLAY
-from .forms import CustomUserCreationForm, CustomUserChangeForm
+
+from .forms import CustomUserChangeForm, CustomUserCreationForm
 from .models import CustomUser, Follow
 
 
@@ -41,8 +42,7 @@ class CustomUserAdmin(UserAdmin):
                 'password1',
                 'password2',
                 'is_superuser'
-            )}
-        ),
+            )}),
     )
     search_fields = ('email', 'username', 'first_name', 'last_name')
     ordering = ('id', 'username')

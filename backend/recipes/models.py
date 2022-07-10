@@ -1,5 +1,6 @@
+from django.core.validators import MinValueValidator
 from django.db import models
-from django.core.validators import MinValueValidator, RegexValidator
+
 from users.models import CustomUser
 
 
@@ -44,7 +45,7 @@ class Recipe(models.Model):
         Tag,
         related_name='recipes',
         verbose_name='Тег',
-        )
+    )
     ingredients = models.ManyToManyField(
         Ingredient,
         through='IngredientRecipe',
@@ -55,7 +56,6 @@ class Recipe(models.Model):
         related_name='recipes',
         verbose_name='Автор',
     )
-
 
     class Meta:
         verbose_name_plural = 'Рецепт'
@@ -138,7 +138,7 @@ class ShoppingCart(models.Model):
         constraints = [
             models.UniqueConstraint(
                 fields=('user', 'recipe'),
-                name='unique_favorite'
+                name='unique_shopping_cart'
             ),
         ]
         verbose_name_plural = 'Списки покупок'

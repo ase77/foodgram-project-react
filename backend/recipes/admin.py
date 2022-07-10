@@ -1,9 +1,9 @@
 from django.contrib import admin
 
 from foodgram.settings import VALUE_DISPLAY
-from .models import (
-    Tag, Ingredient, Recipe, IngredientRecipe, Favorite, ShoppingCart
-)
+
+from .models import (Favorite, Ingredient, IngredientRecipe, Recipe,
+                     ShoppingCart, Tag)
 
 
 @admin.register(Tag)
@@ -17,25 +17,19 @@ class TagAdmin(admin.ModelAdmin):
 class IngredientAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'measurement_unit')
     search_fields = ('name',)
-    list_filter = ('measurement_unit',)
+    list_filter = ('name', 'measurement_unit')
     empty_value_display = VALUE_DISPLAY
 
 
 @admin.register(Recipe)
 class RecipeAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'author')
+    list_display = ('id', 'name', 'author', 'get_added_favorite')
     list_filter = ('author', 'name', 'tags')
     search_fields = ('name',)
     empty_value_display = VALUE_DISPLAY
 
-    # def amount_tags(self, obj):
-    #     print(f'FOOBAR___{obj}')
-    #     print(f'FOOBAR___{obj.tags}')
-    #     print(f'FOOBAR___{obj.tags.values_list('name')}')
-    #     return obj
-
-    # def amount_ingredients(self, obj):
-    #     return "\n".join([i[0] for i in obj.ingredients.values_list('name')])
+    def get_added_favorite(self, obj):
+        return obj.favorite_recipe.count()
 
 
 @admin.register(IngredientRecipe)

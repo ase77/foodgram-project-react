@@ -1,11 +1,17 @@
+import csv
 from rest_framework.pagination import PageNumberPagination
 from rest_framework import permissions, viewsets, mixins, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from django.shortcuts import get_object_or_404
-from users.models import CustomUser
-from recipes.models import Tag, Ingredient, Recipe
-from .serializers import CustomUserSerializer, SetPasswordSerializer, TagSerializer, IngredientSerializer, RecipeCreateSerializer, RecipeViewSerializer
+from django.http import HttpResponse
+from users.models import CustomUser, Follow
+from recipes.models import Tag, Ingredient, Recipe, IngredientRecipe, Favorite, ShoppingCart
+from .serializers import (
+    CustomUserSerializer, SetPasswordSerializer,TagSerializer,
+    IngredientSerializer, RecipeCreateSerializer, RecipeViewSerializer,
+    FollowSerializer, FavoriteSerializer, ShoppingCartSerializer
+)
 
 
 class UserModelViewSet(mixins.CreateModelMixin,
@@ -47,6 +53,57 @@ class UserModelViewSet(mixins.CreateModelMixin,
             return Response({'status': 'Пароль успешно изменен'},
                             status=status.HTTP_204_NO_CONTENT)
 
+    @action(methods=['get'], detail=False,
+            permission_classes=[permissions.IsAuthenticated],
+            url_name='users')
+    def subscriptions(self, request, *args, **kwargs):
+        user = request.user
+        queryset = CustomUser.objects.filter(following__user=user)
+        serializer = FollowSerializer(queryset, many=True)
+        return Response(serializer.data)
+
+    @action(methods=['post'], detail=True,
+            permission_classes=[permissions.IsAuthenticated],
+            url_name='users')
+    def subscribe(self, request, *args, **kwargs):
+        author_id = kwargs.get('pk', None)
+        user = request.user
+        author = get_object_or_404(CustomUser, id=author_id)
+        if author == user:
+            return Response(
+                {'status': 'Нельзя подписаться на самого себя'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        elif Follow.objects.filter(user=user, author_id=author_id).exists():
+            return Response(
+                {'status': f'На автора "{author}" вы уже подписаны'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        else:
+            Follow.objects.create(user=user, author_id=author_id)
+            return Response(FollowSerializer(
+                author,
+                context={'request': request}).data,
+                status=status.HTTP_201_CREATED
+            )
+
+    @subscribe.mapping.delete
+    def delete_subscribe(self, request, *args, **kwargs):
+        author_id = kwargs.get('pk', None)
+        user = request.user
+        author = get_object_or_404(CustomUser, id=author_id)
+        if Follow.objects.filter(user=user, author_id=author_id).exists():
+            follow = get_object_or_404(Follow, user=user, author_id=author_id)
+            follow.delete()
+            return Response(
+                {'status': f'Вы успешно отписались от автора "{author}"'},
+                status=status.HTTP_204_NO_CONTENT
+            )
+        return Response(
+            {'status': f'Вы не подписаны на автора "{author}"'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
 
 class TagViewSet(mixins.RetrieveModelMixin,
                  mixins.ListModelMixin,
@@ -69,7 +126,7 @@ class RecipeViewSet(mixins.RetrieveModelMixin,
                     mixins.DestroyModelMixin,
                     viewsets.GenericViewSet):
     queryset = Recipe.objects.all()
-    permission_classes = [permissions.AllowAny]
+    # permission_classes = [permissions.AllowAny]
     # filter_backends = [DjangoFilterBackend]
     # filterset_class = RecipeFilter
     pagination_class = PageNumberPagination
@@ -142,3 +199,109 @@ class RecipeViewSet(mixins.RetrieveModelMixin,
 
     def perform_update(self, serializer):
         serializer.save()
+
+    @action(methods=['post'], detail=True,
+            permission_classes=[permissions.IsAuthenticated],
+            url_name='recipes')
+    def favorite(self, request, *args, **kwargs):
+        recipe_pk = kwargs.get('pk', None)
+        user_id =  request.user.id
+        if Favorite.objects.filter(
+                user=request.user, recipe=recipe_pk).exists():
+            return Response(
+                {'status': 'Рецепт уже был добавлен в избранное'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        data = {'user': user_id, 'recipe': recipe_pk}
+        serializer = FavoriteSerializer(data=data, context={'request': request})
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    @favorite.mapping.delete
+    def delete_favorite(self, request, *args, **kwargs):
+        recipe_pk = kwargs.get('pk', None)
+        user = request.user
+        recipe = get_object_or_404(Recipe, id=recipe_pk)
+        if Favorite.objects.filter(user=user, recipe=recipe).exists():
+            favorite = get_object_or_404(Favorite, user=user, recipe=recipe)
+            favorite.delete()
+            return Response(
+                {'status': f'Рецепт "{recipe.name}" удален из избранного'},
+                status=status.HTTP_204_NO_CONTENT
+            )
+        return Response(
+            {'status': f'Рецепт "{recipe.name}" не находится в избранном'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    @action(methods=['post'], detail=True,
+            permission_classes=[permissions.IsAuthenticated],
+            url_name='recipes')
+    def shopping_cart(self, request, *args, **kwargs):
+        recipe_pk = kwargs.get('pk', None)
+        user_id =  request.user.id
+        if ShoppingCart.objects.filter(
+            user=request.user, recipe=recipe_pk).exists():
+            return Response(
+                {'status': 'Рецепт уже был добавлен в список покупок'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        data = {'user': user_id, 'recipe': recipe_pk}
+        serializer = ShoppingCartSerializer(
+            data=data, context={'request': request}
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    @shopping_cart.mapping.delete
+    def delete_shopping_cart(self, request, *args, **kwargs):
+        recipe_pk = kwargs.get('pk', None)
+        user = request.user
+        recipe = get_object_or_404(Recipe, id=recipe_pk)
+        if ShoppingCart.objects.filter(user=user, recipe=recipe).exists():
+            favorite = get_object_or_404(ShoppingCart, user=user, recipe=recipe)
+            favorite.delete()
+            return Response(
+                {'status': f'Рецепт "{recipe.name}" удален из списка покупок'},
+                status=status.HTTP_204_NO_CONTENT
+            )
+        return Response(
+            {'status': f'Рецепт "{recipe.name}" не находится в списке покупок'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    @action(methods=['get'], detail=False,
+            permission_classes=[permissions.IsAuthenticated],
+            url_name='recipes')
+    def download_shopping_cart(self, request, *args, **kwargs):
+        ingredients = IngredientRecipe.objects.filter(
+            recipe__shopping_recipe__user=request.user).values_list(
+            'ingredient__name', 'ingredient__measurement_unit',
+            'amount'
+        )
+        if not ingredients:
+            return Response(
+                {'status': 'Нет рецептов в списке покупок'},
+                status=status.HTTP_400_BAD_REQUEST
+        )
+        value_dict = {}
+        for item in ingredients:
+            name = item[0]
+            if name not in value_dict:
+                value_dict[name] = {
+                    'ед.изм.': item[1],
+                    'кол-во': item[2]
+                }
+            else:
+                value_dict[name]['кол-во'] += item[2]
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = (
+            'attachment; filename="shopping_cart.csv"'
+        )
+        writer = csv.writer(response)
+        writer.writerow(['name', 'amount', 'measurement_unit'])
+        for key, value in value_dict.items():
+            writer.writerow([key, value["кол-во"], value["ед.изм."]])
+        return response

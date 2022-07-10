@@ -1,17 +1,22 @@
-from django.shortcuts import get_object_or_404
 from rest_framework import serializers
-from users.models import CustomUser
-from recipes.models import Tag, Ingredient, IngredientRecipe, Recipe
+from users.models import CustomUser, Follow
+from recipes.models import (
+    Tag, Ingredient, IngredientRecipe, Recipe, Favorite, ShoppingCart
+)
 
 
 class CustomUserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True)
+    is_subscribed = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = CustomUser
         fields = [
-            'id', 'username', 'email', 'first_name', 'last_name', 'password'
+            'id', 'username', 'email', 'first_name', 'last_name', 'password', 'is_subscribed'
         ]
+
+    def get_is_subscribed(self, obj):
+        return Follow.objects.filter(user=obj, author=obj.id).exists()
 
 
 class SetPasswordSerializer(serializers.ModelSerializer):
@@ -21,6 +26,30 @@ class SetPasswordSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = ['new_password', 'current_password']
+
+
+class RecipeForFollowSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Recipe
+        fields = ('id', 'name', 'image', 'cooking_time')
+
+
+class FollowSerializer(CustomUserSerializer):
+    recipes = serializers.SerializerMethodField(read_only=True)
+    recipes_count = serializers.SerializerMethodField(read_only=True)
+
+    class Meta:
+        model = CustomUser
+        fields = ('email', 'id', 'username', 'first_name', 'last_name',
+                  'is_subscribed', 'recipes', 'recipes_count')
+
+    def get_recipes_count(self, obj):
+        return obj.recipes.count()
+
+    def get_recipes(self, obj):
+        recipes = obj.recipes.all()
+        return RecipeForFollowSerializer(recipes, many=True).data
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -64,7 +93,6 @@ class RecipeViewSerializer(serializers.ModelSerializer):
 
 
 class AddIngredientSerializer(serializers.ModelSerializer):
-
     id = serializers.PrimaryKeyRelatedField(queryset=Ingredient.objects.all())
 
     class Meta:
@@ -73,7 +101,6 @@ class AddIngredientSerializer(serializers.ModelSerializer):
 
 
 class RecipeCreateSerializer(serializers.ModelSerializer):
-
     tags = serializers.PrimaryKeyRelatedField(
         queryset=Tag.objects.all(), many=True)
     ingredients = AddIngredientSerializer(many=True)
@@ -142,3 +169,23 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
                 amount=ingredient['amount']
             )
         return super().update(instance, validated_data)
+
+
+class FavoriteSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Favorite
+        fields = ('user', 'recipe')
+
+    def to_representation(self, instance):
+        return RecipeForFollowSerializer(instance.recipe).data
+
+
+class ShoppingCartSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = ShoppingCart
+        fields = ('user', 'recipe')
+
+    def to_representation(self, instance):
+        return RecipeForFollowSerializer(instance.recipe).data

@@ -1,8 +1,9 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
+from foodgram.settings import VALUE_DISPLAY
 from .forms import CustomUserCreationForm, CustomUserChangeForm
-from .models import CustomUser
+from .models import CustomUser, Follow
 
 
 @admin.register(CustomUser)
@@ -45,3 +46,12 @@ class CustomUserAdmin(UserAdmin):
     )
     search_fields = ('email', 'username', 'first_name', 'last_name')
     ordering = ('id', 'username')
+    empty_value_display = VALUE_DISPLAY
+
+
+@admin.register(Follow)
+class FollowAdmin(admin.ModelAdmin):
+    list_display = ('id', 'user', 'author')
+    search_fields = ('user', 'author')
+    list_filter = ('user', 'author')
+    empty_value_display = VALUE_DISPLAY

@@ -10,7 +10,7 @@ SECRET_KEY = os.getenv(
     'SECRET_KEY', default='#ta!631n=c^@pbytik($e8c7v71d-_^yg&y*!v59^=kfj0ooew'
 )
 
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', default='*')
 
@@ -24,6 +24,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'django_filters',
+    'colorfield',
     'djoser',
     'api',
     'recipes',
@@ -93,7 +94,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'ru'
 
 TIME_ZONE = 'UTC'
 

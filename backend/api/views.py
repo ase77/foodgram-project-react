@@ -1,9 +1,6 @@
-import csv
-
-from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters, mixins, permissions, status, viewsets
+from rest_framework import filters, permissions, status
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
@@ -12,6 +9,9 @@ from recipes.models import (Favorite, Ingredient, IngredientRecipe, Recipe,
                             ShoppingCart, Tag)
 from users.models import CustomUser, Follow
 
+from .custom_viewset import (CreateListRetrieveViewSet, ListRetrieveViewSet,
+                             RetrieveListCreateUpdateDestroyViewSet)
+from .download_shopping_cart import download_pdf
 from .filters import RecipeFilter
 from .serializers import (CustomUserSerializer, FavoriteSerializer,
                           FollowSerializer, IngredientSerializer,
@@ -20,10 +20,7 @@ from .serializers import (CustomUserSerializer, FavoriteSerializer,
                           TagSerializer)
 
 
-class UserModelViewSet(mixins.CreateModelMixin,
-                       mixins.RetrieveModelMixin,
-                       mixins.ListModelMixin,
-                       viewsets.GenericViewSet):
+class UserModelViewSet(CreateListRetrieveViewSet):
     queryset = CustomUser.objects.all()
     serializer_class = CustomUserSerializer
     pagination_class = PageNumberPagination
@@ -117,17 +114,13 @@ class UserModelViewSet(mixins.CreateModelMixin,
         )
 
 
-class TagViewSet(mixins.RetrieveModelMixin,
-                 mixins.ListModelMixin,
-                 viewsets.GenericViewSet):
+class TagViewSet(ListRetrieveViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
     pagination_class = None
 
 
-class IngredientViewSet(mixins.RetrieveModelMixin,
-                        mixins.ListModelMixin,
-                        viewsets.GenericViewSet):
+class IngredientViewSet(ListRetrieveViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     pagination_class = None
@@ -135,12 +128,7 @@ class IngredientViewSet(mixins.RetrieveModelMixin,
     search_fields = ['^name']
 
 
-class RecipeViewSet(mixins.RetrieveModelMixin,
-                    mixins.ListModelMixin,
-                    mixins.CreateModelMixin,
-                    mixins.UpdateModelMixin,
-                    mixins.DestroyModelMixin,
-                    viewsets.GenericViewSet):
+class RecipeViewSet(RetrieveListCreateUpdateDestroyViewSet):
     queryset = Recipe.objects.all()
     pagination_class = PageNumberPagination
     filter_backends = [DjangoFilterBackend]
@@ -314,22 +302,4 @@ class RecipeViewSet(mixins.RetrieveModelMixin,
                 {'status': 'Нет рецептов в списке покупок'},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        value_dict = {}
-        for item in ingredients:
-            name = item[0]
-            if name not in value_dict:
-                value_dict[name] = {
-                    'ед.изм.': item[1],
-                    'кол-во': item[2]
-                }
-            else:
-                value_dict[name]['кол-во'] += item[2]
-        response = HttpResponse(content_type='text/csv')
-        response['Content-Disposition'] = (
-            'attachment; filename="shopping_cart.csv"'
-        )
-        writer = csv.writer(response)
-        writer.writerow(['name', 'amount', 'measurement_unit'])
-        for key, value in value_dict.items():
-            writer.writerow([key, value["кол-во"], value["ед.изм."]])
-        return response
+        return download_pdf(ingredients)

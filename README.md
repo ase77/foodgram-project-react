@@ -13,4 +13,36 @@
 ![https://github.com/features/actions](https://camo.githubusercontent.com/d9698cafacdfcb0e1d80d16ecdbcdc8c58c6fb59914d3cbf5e439f0881157814/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f2d476974487562253230416374696f6e732d3436343634363f7374796c653d666c6174266c6f676f3d476974487562253230616374696f6e73266c6f676f436f6c6f723d35364330433026636f6c6f723d303038303830)
 ![https://cloud.yandex.ru/](https://camo.githubusercontent.com/a571043856303345577ffa9977e04a90df121767ecff17fd6d080bb304d9854d/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f2d59616e6465782e436c6f75642d3436343634363f7374796c653d666c6174266c6f676f3d59616e6465782e436c6f7564266c6f676f436f6c6f723d35364330433026636f6c6f723d303038303830)
 
+___
+
+## Список доступных роутов
+| Method| Route | Description |
+  :--------:  | :--- | :---- |
+| GET | `/api/users/` | Список пользователей |
+| POST | `/api/users/` | Регистрация пользователя |
+| GET | `/api/users/<id>/` | Профиль пользователя |
+| GET | `/api/users/me/` | Текущий пользователь |
+| POST | `/api/users/set_password/` | Изменение пароля |
+| POST | `/api/auth/token/login/` | Получить токен авторизации |
+| POST | `/api/auth/token/logout/` | Удаление токена |
+| GET | `/api/tags/` | Cписок тегов |
+| GET | `/api/tags/<id>/` | Получение тега |
+| GET | `/api/recipe/` | Список рецептов |
+| POST | `/api/recipe/` | Создание рецепта |
+| GET | `/api/recipe/<id>/` | Получение рецепта |
+| PATCH | `/api/recipe/<id>/` | Обновление рецепта |
+| DELETE | `/api/recipe/<id>/` | Удаление рецепта |
+| GET | `/api/recipes/download_shopping_cart/` | Скачать список покупок |
+| POST | `/api/recipes/<id>/shopping_cart/` | Добавить рецепт в список покупок |
+| POST | `/api/recipes/<id>/shopping_cart/` | Удалить рецепт из списка покупок |
+| POST | `/api/recipes/<id>/favorite/` | Добавить рецепт в избранное |
+| DELETE | `/api/recipes/<id>/favorite/` | Удалить рецепт из избранного |
+| GET | `/api/users/subscriptions/` | Мои подписки |
+| POST | `/api/users/<id>/subscribe/` | Подписаться на пользователя |
+| DELETE | `/api/users/<id>/subscribe/` | Отписаться от пользователя |
+| GET | `/api/ingredients/` | Список ингредиентов |
+| GET | `/api/ingredients/<id>` | Получение ингредиента |
+
+
+
 [__В начало__](#anchor) :point_up:

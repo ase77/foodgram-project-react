@@ -1,3 +1,4 @@
+from colorfield.fields import ColorField
 from django.core.validators import MinValueValidator
 from django.db import models
 
@@ -5,9 +6,9 @@ from users.models import CustomUser
 
 
 class Tag(models.Model):
-    name = models.CharField('Нименование', max_length=150)
-    color = models.CharField('Цвет', max_length=7, default="#e26c2d")
-    slug = models.SlugField(unique=True,)
+    name = models.CharField('Нименование', max_length=150, unique=True)
+    color = ColorField('Цвет "HEX"', default="#e26c2d", unique=True)
+    slug = models.SlugField('Слаг', max_length=20, unique=True)
 
     class Meta:
         verbose_name_plural = 'Тег'

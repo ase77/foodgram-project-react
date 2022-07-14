@@ -47,19 +47,19 @@ class UserModelViewSet(CreateListRetrieveViewSet):
     def set_password(self, request, *args, **kwargs):
         user = get_object_or_404(CustomUser, pk=request.user.id)
         serializer = SetPasswordSerializer(data=request.data)
-        if serializer.is_valid():
-            if not user.check_password(
-                    serializer.data.get("current_password")):
-                return Response(
-                    {'status': 'Текущий пароль не действителен'},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-            user.set_password(serializer.validated_data['new_password'])
-            user.save()
+        serializer.is_valid(raise_exception=True)
+        if not user.check_password(
+                serializer.data.get("current_password")):
             return Response(
-                {'status': 'Пароль успешно изменен'},
-                status=status.HTTP_204_NO_CONTENT
+                {'status': 'Текущий пароль не действителен'},
+                status=status.HTTP_400_BAD_REQUEST
             )
+        user.set_password(serializer.validated_data['new_password'])
+        user.save()
+        return Response(
+            {'status': 'Пароль успешно изменен'},
+            status=status.HTTP_204_NO_CONTENT
+        )
 
     @action(methods=['get'], detail=False,
             permission_classes=[permissions.IsAuthenticated],

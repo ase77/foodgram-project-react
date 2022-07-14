@@ -185,8 +185,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         return recipe
 
     def to_representation(self, instance):
-        recipe = RecipeViewSerializer(instance).data
-        return recipe
+        return RecipeViewSerializer(instance).data
 
     def update(self, instance, validated_data):
         instance.tags.clear()

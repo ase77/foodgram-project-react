@@ -24,7 +24,7 @@ class Command(BaseCommand):
                 print(f'Loading {value.__name__} data')
 
         for row in DictReader(
-                open('../data/ingredients.csv', encoding="utf8")):
+                open('./data/ingredients.csv', encoding="utf8")):
             if row['name'] not in Ingredient.objects.all():
                 ingredients = Ingredient(
                     name=row['name'],

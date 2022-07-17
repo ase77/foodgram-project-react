@@ -16,8 +16,11 @@
 ## Сайт
 
 Сайт доступен по ссылке: http://foodgramproject.hopto.org/
+
 Админка доступка по ссылке: http://foodgramproject.hopto.org/admin/
+
 Документация доступка по ссылке: http://foodgramproject.hopto.org/api/docs/
+
 | user | email | password | token | superuser |
   :--------  | :--- | :---- | :----: | :----: |
 | admin | super@user.ru | admin | v | v |

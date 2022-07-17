@@ -23,7 +23,9 @@ services:
       - ./.env
 
   frontend:
-    image: ase77/foodgram_frontend:latest
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
     volumes:
       - ../frontend/:/app/result_build/
 
@@ -33,10 +35,10 @@ services:
       - "80:80"
     volumes:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf
-      - static_value:/var/html/static/
-      - media_value:/var/html/media/
       - ../frontend/build:/usr/share/nginx/html/
       - ../docs:/usr/share/nginx/html/api/docs/
+      - static_value:/var/html/static/
+      - media_value:/var/html/media/
     restart: always
     depends_on:
       - frontend

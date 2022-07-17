@@ -63,7 +63,7 @@ def download_pdf(ingredients):
     pdfmetrics.registerFont(TTFont('Verdana', 'Verdana.ttf'))
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = (
-        'attachment; filename="shopping_list.pdf"'
+        'attachment; filename="shopping_cart.pdf"'
     )
     p.setFont("Verdana", 10)
     x = 30

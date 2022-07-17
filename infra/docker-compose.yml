@@ -11,8 +11,6 @@ services:
 
   backend:
     image: ase77/foodgram:latest
-    expose:
-      - 8000
     restart: always
     volumes:
       - static_value:/app/static/

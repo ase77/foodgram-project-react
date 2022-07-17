@@ -61,6 +61,10 @@ def download_pdf(ingredients):
     buffer = io.BytesIO()
     p = canvas.Canvas(buffer)
     pdfmetrics.registerFont(TTFont('Verdana', 'Verdana.ttf'))
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = (
+        'attachment; filename="shopping_list.pdf"'
+    )
     p.setFont("Verdana", 10)
     x = 30
     y = 780
@@ -72,7 +76,4 @@ def download_pdf(ingredients):
         y -= 15
     p.showPage()
     p.save()
-    buffer.seek(0)
-    return FileResponse(
-        buffer, as_attachment=True, filename='shopping_cart.pdf'
-    )
+    return response

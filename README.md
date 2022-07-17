@@ -13,6 +13,18 @@
 ![https://github.com/features/actions](https://camo.githubusercontent.com/d9698cafacdfcb0e1d80d16ecdbcdc8c58c6fb59914d3cbf5e439f0881157814/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f2d476974487562253230416374696f6e732d3436343634363f7374796c653d666c6174266c6f676f3d476974487562253230616374696f6e73266c6f676f436f6c6f723d35364330433026636f6c6f723d303038303830)
 ![https://cloud.yandex.ru/](https://camo.githubusercontent.com/a571043856303345577ffa9977e04a90df121767ecff17fd6d080bb304d9854d/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f2d59616e6465782e436c6f75642d3436343634363f7374796c653d666c6174266c6f676f3d59616e6465782e436c6f7564266c6f676f436f6c6f723d35364330433026636f6c6f723d303038303830)
 
+## Сайт
+
+Сайт доступен по ссылке: http://foodgramproject.hopto.org/
+Админка доступка по ссылке: http://foodgramproject.hopto.org/admin/
+Документация доступка по ссылке: http://foodgramproject.hopto.org/api/docs/
+| user | email | password | token | superuser |
+  :--------  | :--- | :---- | :----: | :----: |
+| admin | super@user.ru | admin | v | v |
+| user1 | normal@user1.ru | foodgram1 | v | х |
+| user2 | normal@user2.ru | foodgram2 | х | х |
+
+
 ## Список доступных роутов
 | Method| Route | Description |
   :--------:  | :--- | :---- |

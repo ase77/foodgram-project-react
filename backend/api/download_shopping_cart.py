@@ -1,7 +1,7 @@
 import csv
 import io
 
-from django.http import HttpResponse
+from django.http import FileResponse, HttpResponse
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfgen import canvas
@@ -61,10 +61,7 @@ def download_pdf(ingredients):
     buffer = io.BytesIO()
     p = canvas.Canvas(buffer)
     pdfmetrics.registerFont(TTFont('Verdana', 'Verdana.ttf'))
-    response = HttpResponse(content_type='application/pdf')
-    response['Content-Disposition'] = (
-        'attachment; filename="shopping_cart.pdf"'
-    )
+
     p.setFont("Verdana", 10)
     x = 30
     y = 780
@@ -76,4 +73,7 @@ def download_pdf(ingredients):
         y -= 15
     p.showPage()
     p.save()
-    return response
+    buffer.seek(0)
+    return FileResponse(
+        buffer, as_attachment=True, filename='shopping_cart.pdf'
+    )

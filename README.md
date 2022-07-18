@@ -21,11 +21,11 @@
 
 Документация доступка по ссылке: http://foodgramproject.hopto.org/api/docs/
 
-| user | email | password | token | superuser |
-  :--------  | :--- | :---- | :----: | :----: |
-| admin | super@user.ru | admin | v | v |
-| user1 | normal@user1.ru | foodgram1 | v | х |
-| user2 | normal@user2.ru | foodgram2 | х | х |
+| user  | email           | password  | token | superuser |
+ :----- | :-------------- | :-------- | :---: | :-------: |
+| admin | super@user.ru   | admin     |   v   |     v     |
+| user1 | normal@user1.ru | foodgram1 |   v   |     х     |
+| user2 | normal@user2.ru | foodgram2 |   х   |     х     |
 
 
 ## Список доступных роутов

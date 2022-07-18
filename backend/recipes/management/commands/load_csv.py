@@ -40,16 +40,3 @@ class Command(BaseCommand):
                 slug=row['slug'],
             )
             tags.save()
-
-        for row in DictReader(
-                open('./data/users.csv', encoding="utf8")):
-            users = CustomUser(
-                email=row['email'],
-                username=row['username'],
-                first_name=row['first_name'],
-                last_name=row['last_name'],
-                password=row['password'],
-                is_staff=row['is_staff'],
-                is_superuser=row['is_superuser'],
-            )
-            users.save()

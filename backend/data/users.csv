@@ -1,4 +1,0 @@
-email,username,first_name,last_name,password,is_staff,is_superuser
-super@user.ru,admin,admin,admin,admin,True,True
-normal@user1.ru,user1,user1,user1,foodgram1,False,False
-normal@user2.ru,user2,user2,user2,foodgram2,False,False

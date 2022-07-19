@@ -70,7 +70,7 @@ class UserModelViewSet(CreateListRetrieveViewSet):
         user = request.user
         queryset = CustomUser.objects.filter(following__user=user)
         page = self.paginate_queryset(queryset)
-        if page:
+        if page is not None:
             serializer = FollowSerializer(page, many=True)
             return self.get_paginated_response(serializer.data)
         serializer = FollowSerializer(queryset, many=True)

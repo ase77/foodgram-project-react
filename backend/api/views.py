@@ -66,7 +66,8 @@ class UserModelViewSet(CreateListRetrieveViewSet):
             url_name='users')
     def subscriptions(self, request, *args, **kwargs):
         user = request.user
-        queryset = Follow.objects.filter(following__user=user)
+        print(f'FOOBAR_user_!_{user}')
+        queryset = CustomUser.objects.filter(following__user=user)
         serializer = FollowSerializer(queryset, many=True)
         return Response(serializer.data)
 

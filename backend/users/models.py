@@ -52,13 +52,17 @@ class Follow(models.Model):
 
     class Meta:
         constraints = [
+            models.CheckConstraint(
+                check=~models.Q(user=models.F('following')),
+                name='self_follow'
+            ),
             models.UniqueConstraint(
                 fields=('user', 'author'),
                 name='unique_follow'
             ),
         ]
         verbose_name_plural = 'Подписки'
-        verbose_name = 'Подписку'
+        verbose_name = 'Подписка'
         ordering = ('-id',)
 
     def __str__(self):

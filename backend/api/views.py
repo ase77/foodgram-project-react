@@ -11,7 +11,7 @@ from users.models import CustomUser, Follow
 
 from .custom_viewset import (CreateListRetrieveViewSet, ListRetrieveViewSet,
                              RetrieveListCreateUpdateDestroyViewSet)
-from .download_shopping_cart import download_pdf
+from .download_shopping_cart import download_csv
 from .filters import RecipeFilter
 from .serializers import (CustomUserSerializer, FavoriteSerializer,
                           FollowSerializer, IngredientSerializer,
@@ -306,7 +306,4 @@ class RecipeViewSet(RetrieveListCreateUpdateDestroyViewSet):
                 {'status': 'Нет рецептов в списке покупок'},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        result = download_pdf(ingredients)
-        return FileResponse(
-            result, as_attachment=True, filename='shopping_cart.pdf'
-        )
+        return download_csv(ingredients)

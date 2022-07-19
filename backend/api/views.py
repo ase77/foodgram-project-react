@@ -1,11 +1,13 @@
+from django.http import FileResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from recipes.models import (Favorite, Ingredient, IngredientRecipe, Recipe,
-                            ShoppingCart, Tag)
 from rest_framework import filters, permissions, status
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
+
+from recipes.models import (Favorite, Ingredient, IngredientRecipe, Recipe,
+                            ShoppingCart, Tag)
 from users.models import CustomUser, Follow
 
 from .custom_viewset import (CreateListRetrieveViewSet, ListRetrieveViewSet,
@@ -305,4 +307,7 @@ class RecipeViewSet(RetrieveListCreateUpdateDestroyViewSet):
                 {'status': 'Нет рецептов в списке покупок'},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        return download_pdf(ingredients)
+        result = download_pdf(ingredients)
+        return FileResponse(
+            result, as_attachment=True, filename='shopping_cart.pdf'
+        )

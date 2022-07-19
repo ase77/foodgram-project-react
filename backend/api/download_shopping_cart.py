@@ -1,7 +1,7 @@
 import csv
 import io
 
-from django.http import FileResponse, HttpResponse
+from django.http import HttpResponse
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfgen import canvas
@@ -74,6 +74,4 @@ def download_pdf(ingredients):
     p.showPage()
     p.save()
     buffer.seek(0)
-    return FileResponse(
-        buffer, as_attachment=True, filename='shopping_cart.pdf'
-    )
+    return buffer

@@ -1,5 +1,4 @@
 from django.contrib import admin
-
 from foodgram.settings import VALUE_DISPLAY
 
 from .models import (Favorite, Ingredient, IngredientRecipe, Recipe,

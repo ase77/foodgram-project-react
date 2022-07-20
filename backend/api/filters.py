@@ -30,6 +30,3 @@ class IngredientFilter(SearchFilter):
     class Meta:
         model = Ingredient
         fields = {'name': ['startswith'], }
-
-# class IngredientFilter(SearchFilter):
-#     search_param = 'name'

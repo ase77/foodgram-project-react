@@ -25,11 +25,12 @@ class Command(BaseCommand):
 
         for row in DictReader(
                 open('./data/ingredients.csv', encoding="utf8")):
-            ingredients = Ingredient(
-                name=row['name'],
-                measurement_unit=row['measurement_unit'],
-            )
-            ingredients.save()
+            if not Ingredient.objects.filter(name=row['name']).exists():
+                ingredients = Ingredient(
+                    name=row['name'],
+                    measurement_unit=row['measurement_unit'],
+                )
+                ingredients.save()
 
         for row in DictReader(
                 open('./data/tags.csv', encoding="utf8")):

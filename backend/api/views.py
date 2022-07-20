@@ -2,7 +2,7 @@ from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from recipes.models import (Favorite, Ingredient, IngredientRecipe, Recipe,
                             ShoppingCart, Tag)
-from rest_framework import filters, permissions, status
+from rest_framework import permissions, status
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
@@ -11,7 +11,7 @@ from users.models import CustomUser, Follow
 from .custom_viewset import (CreateListRetrieveViewSet, ListRetrieveViewSet,
                              RetrieveListCreateUpdateDestroyViewSet)
 from .download_shopping_cart import download_csv
-from .filters import RecipeFilter
+from .filters import RecipeFilter, IngredientFilter
 from .serializers import (CustomUserSerializer, FavoriteSerializer,
                           FollowSerializer, IngredientSerializer,
                           RecipeCreateSerializer, RecipeViewSerializer,
@@ -127,8 +127,8 @@ class IngredientViewSet(ListRetrieveViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     pagination_class = None
-    filter_backends = [filters.SearchFilter]
-    search_fields = ['^name']
+    filterset_class = IngredientFilter
+    # search_fields = ['^name']
 
 
 class RecipeViewSet(RetrieveListCreateUpdateDestroyViewSet):

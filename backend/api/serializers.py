@@ -6,13 +6,13 @@ from users.models import CustomUser, Follow
 
 
 class CustomUserSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True, required=True)
     is_subscribed = serializers.SerializerMethodField(
         method_name='get_is_subscribed', read_only=True
     )
 
     class Meta:
         model = CustomUser
+        extra_kwargs = {'password': {'write_only': True}}
         fields = [
             'email', 'id', 'username', 'first_name', 'last_name',
             'is_subscribed', 'password'

@@ -125,7 +125,7 @@ class TagViewSet(ListRetrieveViewSet):
 class IngredientViewSet(ListRetrieveViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
-    filter_backends = IngredientFilter
+    filterset_class = IngredientFilter
 
 
 class RecipeViewSet(RetrieveListCreateUpdateDestroyViewSet):

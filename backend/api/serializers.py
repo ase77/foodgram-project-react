@@ -18,6 +18,17 @@ class CustomUserSerializer(serializers.ModelSerializer):
             'is_subscribed', 'password'
         ]
 
+    def create(self, validated_data):
+        user = CustomUser.objects.create(
+            email=validated_data['email'],
+            username=validated_data['username'],
+            first_name=validated_data['first_name'],
+            last_name=validated_data['last_name']
+        )
+        user.set_password(validated_data['password'])
+        user.save()
+        return user
+
     def get_is_subscribed(self, obj):
         return Follow.objects.filter(user=obj, author=obj.id).exists()
 

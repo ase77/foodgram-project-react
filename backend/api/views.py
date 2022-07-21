@@ -46,7 +46,7 @@ class UserModelViewSet(CreateListRetrieveViewSet):
             permission_classes=[permissions.IsAuthenticated], url_name='users')
     def set_password(self, request, *args, **kwargs):
         user = get_object_or_404(CustomUser, pk=request.user.id)
-        serializer = SetPasswordSerializer(user, data=request.data)
+        serializer = SetPasswordSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         if not user.check_password(
                 serializer.data.get("current_password")):

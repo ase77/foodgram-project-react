@@ -120,11 +120,13 @@ class UserModelViewSet(CreateListRetrieveViewSet):
 class TagViewSet(ListRetrieveViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
+    pagination_class = None
 
 
 class IngredientViewSet(ListRetrieveViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
+    pagination_class = None
     filterset_class = IngredientFilter
 
 

@@ -17,13 +17,10 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     last_name = models.CharField(
         verbose_name='Фамилия', max_length=150
     )
-    password = models.CharField(
-        verbose_name='Пароль', max_length=150
-    )
     is_staff = models.BooleanField(default=False)
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['username', 'first_name', 'last_name', 'password']
+    REQUIRED_FIELDS = ['username', 'first_name', 'last_name']
 
     objects = CustomUserManager()
 

@@ -127,7 +127,7 @@ class IngredientViewSet(ListRetrieveViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     pagination_class = None
-    filterset_class = IngredientFilter
+    filter_backends = IngredientFilter
 
 
 class RecipeViewSet(RetrieveListCreateUpdateDestroyViewSet):
@@ -135,6 +135,7 @@ class RecipeViewSet(RetrieveListCreateUpdateDestroyViewSet):
     pagination_class = PageNumberPagination
     filter_backends = [DjangoFilterBackend]
     filterset_class = RecipeFilter
+    search_fields = ['^name']
 
     def get_serializer_class(self):
         if self.action in ('list', 'retrieve'):
